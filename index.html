@@ -24,9 +24,9 @@
 
     <!-- Cabecera Fija con Imagen Temática -->
     <header class="fixed top-0 left-0 w-full z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-xl px-4 py-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-center sm:text-left relative">
-        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 border-slate-600 shadow-inner">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shrink-0 border-[3px] border-indigo-500/50 shadow-lg shadow-indigo-900/20">
             <img 
-                src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=200&q=80" 
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" 
                 alt="" 
                 class="w-full h-full object-cover"
             >
@@ -65,8 +65,8 @@
     </div>
 
     <!-- Lienzo Arrastrable (Canvas) -->
-    <div id="canvas-container" class="w-full h-full cursor-grab pt-32">
-        <div id="mindmap-root" class="origin-top-left transition-transform duration-75 ease-linear p-10 flex justify-center min-w-max">
+    <div id="canvas-container" class="w-full h-full cursor-grab pt-40">
+        <div id="mindmap-root" class="origin-top-left transition-transform duration-75 ease-linear p-10 flex min-w-max">
             <!-- El árbol se renderizará aquí dinámicamente -->
         </div>
     </div>
@@ -104,7 +104,6 @@
         </div>
     </div>
 
-
     <script>
         // === DATOS DEL MAPA CONCEPTUAL ===
         const mindMapData = {
@@ -128,7 +127,7 @@
         const infoModalTitle = document.getElementById('info-modal-title');
         const infoModalContent = document.getElementById('info-modal-content');
 
-        // Diccionario de imágenes temáticas (URLs corregidas para que coincidan con el texto exacto)
+        // Diccionario de imágenes temáticas
         const imageMap = {
             'formación': 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
             'multimedia': 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?auto=format&fit=crop&w=600&q=80',
@@ -220,7 +219,7 @@
             { main: 'bg-teal-900 text-teal-100 border-teal-600/60 hover:bg-teal-800 hover:border-teal-400', child: 'bg-teal-950/80 text-teal-200 border-teal-800/80 hover:bg-teal-900', line: 'bg-teal-600/40', iconText: 'text-teal-300', iconBg: 'bg-teal-500/20' }
         ];
 
-        // === LÓGICA DE RENDERIZADO DEL MAPA ===
+        // === LÓGICA DE RENDERIZADO DEL MAPA (ORIENTACIÓN VERTICAL DE LISTA, EXPANSIÓN HORIZONTAL) ===
         function createNodeElement(node, level = 0, childIndex = 0, passedTheme = null, onOpen = null) {
             const hasChildren = node.children && node.children.length > 0;
             const isRoot = level === 0;
@@ -232,11 +231,13 @@
 
             const lineColorClass = theme ? theme.line : 'bg-slate-600/50';
             const branchContainer = document.createElement('div');
-            branchContainer.className = 'flex flex-col items-center';
+            // Cambiado a flex-row para expandir de izquierda a derecha
+            branchContainer.className = 'flex items-center';
 
             if (!isRoot) {
                 const incomingLine = document.createElement('div');
-                incomingLine.className = `w-[2px] h-10 ${lineColorClass} shrink-0 transition-colors duration-300`;
+                // Cambiada línea a horizontal
+                incomingLine.className = `w-6 sm:w-10 h-[2px] ${lineColorClass} shrink-0 transition-colors duration-300`;
                 branchContainer.appendChild(incomingLine);
             }
 
@@ -259,9 +260,9 @@
             if (hasChildren) {
                 const iconColors = isRoot ? 'bg-white/20 text-white' : `${theme.iconBg} ${theme.iconText}`;
                 iconSpan.className = `ml-4 flex-shrink-0 flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full transition-colors ${iconColors}`;
-                iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5"></i>`;
+                // Los iconos ahora apuntan hacia la derecha (cerrado) y abajo (abierto)
+                iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-down' : 'chevron-right'}" class="w-5 h-5"></i>`;
             } else {
-                // Icono de documento para los nodos hojas (jerarquía inferior)
                 iconSpan.className = `ml-4 flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-700/50 text-slate-300 group transition-transform hover:scale-110`;
                 iconSpan.title = "Ver detalles";
                 iconSpan.innerHTML = `<i data-lucide="file-text" class="w-5 h-5"></i>`;
@@ -274,7 +275,8 @@
                 const openClasses = ['max-w-[8000px]', 'max-h-[3000px]', 'opacity-100'];
                 const closedClasses = ['max-w-0', 'max-h-0', 'opacity-0'];
                 
-                childrenWrapper.className = `flex flex-col items-center overflow-hidden transition-all duration-500 ease-in-out`;
+                // Cambiado para agrupar horizontalmente
+                childrenWrapper.className = `flex items-center overflow-hidden transition-all duration-500 ease-in-out`;
                 if (isOpen) childrenWrapper.classList.add(...openClasses);
                 else childrenWrapper.classList.add(...closedClasses);
 
@@ -283,16 +285,18 @@
                     isOpen = false;
                     childrenWrapper.classList.remove(...openClasses);
                     childrenWrapper.classList.add(...closedClasses);
-                    iconSpan.innerHTML = `<i data-lucide="chevron-down" class="w-5 h-5"></i>`;
+                    iconSpan.innerHTML = `<i data-lucide="chevron-right" class="w-5 h-5"></i>`;
                     lucide.createIcons();
                 };
 
                 const outgoingLine = document.createElement('div');
-                outgoingLine.className = `w-[2px] h-10 ${lineColorClass} shrink-0 transition-colors duration-300`;
+                // Cambiada línea a horizontal
+                outgoingLine.className = `w-6 sm:w-10 h-[2px] ${lineColorClass} shrink-0 transition-colors duration-300`;
                 childrenWrapper.appendChild(outgoingLine);
 
                 const childrenListContainer = document.createElement('div');
-                childrenListContainer.className = `flex flex-row items-start gap-5 md:gap-8 border-t-[2px] ${lineColorClass} pt-8 shrink-0 transition-colors duration-300`;
+                // Cambiado a columna vertical con borde a la izquierda
+                childrenListContainer.className = `flex flex-col items-start gap-4 border-l-[2px] ${lineColorClass} py-4 shrink-0 transition-colors duration-300`;
 
                 const childCloseFuncs = [];
                 node.children.forEach((child, index) => {
@@ -314,13 +318,12 @@
                         isOpen = true; 
                         childrenWrapper.classList.remove(...closedClasses);
                         childrenWrapper.classList.add(...openClasses);
-                        iconSpan.innerHTML = `<i data-lucide="chevron-up" class="w-5 h-5"></i>`;
+                        iconSpan.innerHTML = `<i data-lucide="chevron-down" class="w-5 h-5"></i>`;
                         if (onOpen) onOpen();
                         lucide.createIcons();
                     }
                 });
             } else {
-                // Al hacer clic en un nodo inferior, abre el nuevo modal de información
                 card.addEventListener('click', () => openInfoModal(node.label));
             }
 
@@ -332,9 +335,9 @@
         lucide.createIcons();
 
         // === LÓGICA DE MOVIMIENTO, ZOOM Y RESPONSIVIDAD ===
-        // Ajustamos la escala inicial dependiendo del ancho de la pantalla (móvil vs escritorio)
         let scale = window.innerWidth < 768 ? 0.6 : 0.85;
-        let position = { x: 50, y: window.innerWidth < 768 ? 180 : 150 };
+        // Ajustamos la posición inicial para el layout horizontal
+        let position = { x: window.innerWidth < 768 ? 20 : 60, y: window.innerWidth < 768 ? 160 : 200 };
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
         const canvasContainer = document.getElementById('canvas-container');
@@ -366,13 +369,13 @@
             }
         }
 
-        // Eventos de ratón (Escritorio)
+        // Eventos de ratón
         canvasContainer.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY, e.target));
         window.addEventListener('mousemove', (e) => onDrag(e.clientX, e.clientY));
         window.addEventListener('mouseup', stopDrag);
         canvasContainer.addEventListener('mouseleave', stopDrag);
 
-        // Eventos táctiles (Móviles y Tablets)
+        // Eventos táctiles
         canvasContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 startDrag(e.touches[0].clientX, e.touches[0].clientY, e.target);
@@ -381,19 +384,19 @@
         
         window.addEventListener('touchmove', (e) => {
             if (isDragging && e.touches.length === 1) {
-                e.preventDefault(); // Evita que la pantalla haga scroll vertical mientras mueves el mapa
+                e.preventDefault();
                 onDrag(e.touches[0].clientX, e.touches[0].clientY);
             }
         }, { passive: false });
         
         window.addEventListener('touchend', stopDrag);
 
-        // Controles de botones
+        // Controles
         document.getElementById('btn-zoom-in').addEventListener('click', () => { scale = Math.min(scale + 0.15, 2); updateTransform(); });
         document.getElementById('btn-zoom-out').addEventListener('click', () => { scale = Math.max(scale - 0.15, 0.3); updateTransform(); });
         document.getElementById('btn-reset').addEventListener('click', () => { 
             scale = window.innerWidth < 768 ? 0.6 : 0.85; 
-            position = { x: 50, y: window.innerWidth < 768 ? 180 : 150 }; 
+            position = { x: window.innerWidth < 768 ? 20 : 60, y: window.innerWidth < 768 ? 160 : 200 }; 
             updateTransform(); 
         });
 
