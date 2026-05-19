@@ -40,8 +40,8 @@
         </div>
     </header>
 
-    <!-- Panel de Controles Flotante (Izquierda) -->
-    <div class="absolute top-36 left-6 z-40 bg-slate-800/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-700 flex flex-col gap-2">
+    <!-- Panel de Controles Flotante (Movido Abajo a la Derecha para no estorbar los nodos) -->
+    <div class="absolute bottom-6 right-6 z-40 bg-slate-800/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-700 flex flex-col gap-2">
         <button id="btn-zoom-in" title="Acercar" class="p-2.5 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-indigo-400 transition-colors cursor-pointer">
             <i data-lucide="zoom-in" class="w-[22px] h-[22px]"></i>
         </button>
@@ -55,13 +55,13 @@
         </button>
     </div>
 
-    <!-- Etiqueta de Instrucciones -->
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-base text-slate-300 bg-slate-800/90 backdrop-blur-md px-6 py-3 rounded-3xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium text-center">
-        <span class="flex items-center gap-2">👆 Clic para expandir ramas</span>
+    <!-- Etiqueta de Instrucciones (Adaptada para móviles) -->
+    <div class="absolute bottom-6 left-6 z-30 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 text-xs sm:text-sm text-slate-300 bg-slate-800/90 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium max-w-[60%] sm:max-w-none">
+        <span class="flex items-center gap-2"><i data-lucide="mouse-pointer-click" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Clic para expandir ramas</span><span class="sm:hidden">Expandir</span></span>
         <span class="hidden sm:block text-slate-600">|</span>
-        <span class="flex items-center gap-2 text-indigo-200">📄 Toca los retos finales para ver detalles</span>
+        <span class="flex items-center gap-2 text-indigo-200"><i data-lucide="file-text" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Toca los retos finales para ver detalles</span><span class="sm:hidden">Detalles</span></span>
         <span class="hidden sm:block text-slate-600">|</span>
-        <span class="flex items-center gap-2">🖐️ Arrastra el fondo</span>
+        <span class="flex items-center gap-2"><i data-lucide="move" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Arrastra el fondo</span><span class="sm:hidden">Mover</span></span>
     </div>
 
     <!-- Lienzo Arrastrable (Canvas) -->
@@ -128,16 +128,60 @@
         const infoModalTitle = document.getElementById('info-modal-title');
         const infoModalContent = document.getElementById('info-modal-content');
 
+        // Diccionario de imágenes temáticas (URLs corregidas para que coincidan con el texto exacto)
+        const imageMap = {
+            'formación': 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
+            'multimedia': 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?auto=format&fit=crop&w=600&q=80',
+            'herramientas': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80',
+            'retroalimentación': 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80',
+            'materiales': 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80',
+            'planificación': 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=600&q=80',
+            'presencial': 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
+            'virtual': 'https://images.unsplash.com/photo-1610484826917-0f101a7bf7f4?auto=format&fit=crop&w=600&q=80',
+            'interactividad': 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
+            'transmisivo': 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?auto=format&fit=crop&w=600&q=80',
+            'inestables': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80',
+            'conexiones': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80',
+            'obsoletos': 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=600&q=80',
+            'técnico': 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
+            'desmotivación': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80',
+            'interacción': 'https://images.unsplash.com/photo-1529156069898-49953eb1f5ce?auto=format&fit=crop&w=600&q=80',
+            'síncronas': 'https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80',
+            'autenticidad': 'https://images.unsplash.com/photo-1585076641399-5c06d1b3365f?auto=format&fit=crop&w=600&q=80',
+            'formativa': 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80',
+            'retraso': 'https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=600&q=80',
+            'extendida': 'https://images.unsplash.com/photo-1497215848145-5afd60a3d5ce?auto=format&fit=crop&w=600&q=80',
+            'desbalance': 'https://images.unsplash.com/photo-1498677231914-50a74ad2805f?auto=format&fit=crop&w=600&q=80',
+            'efectividad': 'https://images.unsplash.com/photo-1516534775068-ba3e7458af70?auto=format&fit=crop&w=600&q=80',
+            'modificar': 'https://images.unsplash.com/photo-1455309036818-60c04f995874?auto=format&fit=crop&w=600&q=80',
+            'capacitación': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80',
+            'acompañamiento': 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=600&q=80',
+            'políticas': 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80',
+            'default': 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=600&q=80'
+        };
+
+        function getImageUrlForTitle(title) {
+            const t = title.toLowerCase();
+            for (const [key, url] of Object.entries(imageMap)) {
+                if (t.includes(key)) return url;
+            }
+            return imageMap['default'];
+        }
+
         function openInfoModal(title) {
             infoModalTitle.textContent = title;
+            const imageUrl = getImageUrlForTitle(title);
             
             // Inyectamos el contenido que pertenece a la jerarquía inferior
             infoModalContent.innerHTML = `
-                <div class="bg-slate-700/30 border border-slate-600/50 rounded-xl p-5">
-                    <p class="text-slate-200 mb-3">Has seleccionado un desafío específico dentro del mapa conceptual sobre Entornos Virtuales de Aprendizaje (EVA).</p>
-                    <div class="flex items-start gap-3 mt-4 bg-slate-800 p-4 rounded-lg border border-slate-700">
-                        <i data-lucide="chevron-right-square" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
-                        <p class="font-medium text-slate-100">${title}</p>
+                <div class="bg-slate-700/30 border border-slate-600/50 rounded-xl overflow-hidden shadow-inner">
+                    <img src="${imageUrl}" alt="[Image of ${title}]" class="w-full h-40 sm:h-48 object-cover border-b border-slate-600/50">
+                    <div class="p-5">
+                        <p class="text-slate-200 mb-3">Has seleccionado un desafío específico dentro del mapa conceptual sobre Entornos Virtuales de Aprendizaje (EVA).</p>
+                        <div class="flex items-start gap-3 mt-4 bg-slate-800 p-4 rounded-lg border border-slate-700 shadow-md">
+                            <i data-lucide="chevron-right-square" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
+                            <p class="font-medium text-slate-100">${title}</p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -287,9 +331,10 @@
         mindmapRoot.appendChild(createNodeElement(mindMapData).element);
         lucide.createIcons();
 
-        // === LÓGICA DE MOVIMIENTO Y ZOOM ===
-        let scale = 0.85;
-        let position = { x: 50, y: 150 };
+        // === LÓGICA DE MOVIMIENTO, ZOOM Y RESPONSIVIDAD ===
+        // Ajustamos la escala inicial dependiendo del ancho de la pantalla (móvil vs escritorio)
+        let scale = window.innerWidth < 768 ? 0.6 : 0.85;
+        let position = { x: 50, y: window.innerWidth < 768 ? 180 : 150 };
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
         const canvasContainer = document.getElementById('canvas-container');
@@ -299,31 +344,58 @@
         }
         updateTransform();
 
-        canvasContainer.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.mindmap-node') || e.target.closest('button') || e.target.closest('header')) return;
+        function startDrag(clientX, clientY, target) {
+            if (target.closest('.mindmap-node') || target.closest('button') || target.closest('header')) return;
             isDragging = true;
             canvasContainer.classList.remove('cursor-grab');
             canvasContainer.classList.add('cursor-grabbing');
-            dragStart = { x: e.clientX - position.x, y: e.clientY - position.y };
-        });
+            dragStart = { x: clientX - position.x, y: clientY - position.y };
+        }
 
-        window.addEventListener('mousemove', (e) => {
+        function onDrag(clientX, clientY) {
             if (!isDragging) return;
-            position = { x: e.clientX - dragStart.x, y: e.clientY - dragStart.y };
+            position = { x: clientX - dragStart.x, y: clientY - dragStart.y };
             updateTransform();
-        });
+        }
 
-        window.addEventListener('mouseup', () => {
+        function stopDrag() {
             if (isDragging) {
                 isDragging = false;
                 canvasContainer.classList.remove('cursor-grabbing');
                 canvasContainer.classList.add('cursor-grab');
             }
-        });
+        }
 
+        // Eventos de ratón (Escritorio)
+        canvasContainer.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY, e.target));
+        window.addEventListener('mousemove', (e) => onDrag(e.clientX, e.clientY));
+        window.addEventListener('mouseup', stopDrag);
+        canvasContainer.addEventListener('mouseleave', stopDrag);
+
+        // Eventos táctiles (Móviles y Tablets)
+        canvasContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                startDrag(e.touches[0].clientX, e.touches[0].clientY, e.target);
+            }
+        }, { passive: false });
+        
+        window.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches.length === 1) {
+                e.preventDefault(); // Evita que la pantalla haga scroll vertical mientras mueves el mapa
+                onDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: false });
+        
+        window.addEventListener('touchend', stopDrag);
+
+        // Controles de botones
         document.getElementById('btn-zoom-in').addEventListener('click', () => { scale = Math.min(scale + 0.15, 2); updateTransform(); });
-        document.getElementById('btn-zoom-out').addEventListener('click', () => { scale = Math.max(scale - 0.15, 0.4); updateTransform(); });
-        document.getElementById('btn-reset').addEventListener('click', () => { scale = 0.85; position = { x: 50, y: 150 }; updateTransform(); });
+        document.getElementById('btn-zoom-out').addEventListener('click', () => { scale = Math.max(scale - 0.15, 0.3); updateTransform(); });
+        document.getElementById('btn-reset').addEventListener('click', () => { 
+            scale = window.innerWidth < 768 ? 0.6 : 0.85; 
+            position = { x: 50, y: window.innerWidth < 768 ? 180 : 150 }; 
+            updateTransform(); 
+        });
 
     </script>
 </body>
