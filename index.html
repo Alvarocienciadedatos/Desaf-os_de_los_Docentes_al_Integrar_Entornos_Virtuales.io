@@ -51,7 +51,7 @@
 
     <!-- Lienzo Arrastrable (Canvas) -->
     <div id="canvas-container" class="w-full h-full cursor-grab">
-        <div id="mindmap-root" class="origin-top-left transition-transform duration-75 ease-linear p-10 flex">
+        <div id="mindmap-root" class="origin-top-left transition-transform duration-75 ease-linear p-10 flex justify-center min-w-max">
             <!-- El árbol se renderizará aquí dinámicamente -->
         </div>
     </div>
@@ -144,12 +144,12 @@
 
             // Contenedor principal de la rama
             const branchContainer = document.createElement('div');
-            branchContainer.className = 'flex items-center';
+            branchContainer.className = 'flex flex-col items-center';
 
-            // Línea horizontal entrante (excepto para la raíz)
+            // Línea vertical entrante (excepto para la raíz)
             if (!isRoot) {
                 const incomingLine = document.createElement('div');
-                incomingLine.className = 'w-8 h-[2px] bg-indigo-500/30 shrink-0';
+                incomingLine.className = 'w-[2px] h-8 bg-indigo-500/30 shrink-0';
                 branchContainer.appendChild(incomingLine);
             }
 
@@ -175,7 +175,7 @@
             if (hasChildren) {
                 iconSpan = document.createElement('span');
                 iconSpan.className = `ml-3 flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full transition-colors ${isRoot ? 'bg-white/20 text-white' : 'bg-indigo-500/20 text-indigo-300'}`;
-                iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4"></i>`;
+                iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>`;
                 card.appendChild(iconSpan);
             }
 
@@ -186,21 +186,21 @@
                 const childrenWrapper = document.createElement('div');
                 
                 // Clases de transición para mostrar/ocultar
-                const openClasses = ['max-w-[1500px]', 'max-h-[2000px]', 'opacity-100'];
+                const openClasses = ['max-w-[8000px]', 'max-h-[3000px]', 'opacity-100'];
                 const closedClasses = ['max-w-0', 'max-h-0', 'opacity-0'];
                 
-                childrenWrapper.className = `flex items-center overflow-hidden transition-all duration-500 ease-in-out`;
+                childrenWrapper.className = `flex flex-col items-center overflow-hidden transition-all duration-500 ease-in-out`;
                 if (isOpen) childrenWrapper.classList.add(...openClasses);
                 else childrenWrapper.classList.add(...closedClasses);
 
                 // Línea saliente
                 const outgoingLine = document.createElement('div');
-                outgoingLine.className = 'w-8 h-[2px] bg-indigo-500/30 shrink-0';
+                outgoingLine.className = 'w-[2px] h-8 bg-indigo-500/30 shrink-0';
                 childrenWrapper.appendChild(outgoingLine);
 
-                // Contenedor con borde lateral para los hijos
+                // Contenedor con borde superior para los hijos
                 const childrenListContainer = document.createElement('div');
-                childrenListContainer.className = 'flex flex-col gap-3 border-l-[2px] border-indigo-500/30 py-4 shrink-0';
+                childrenListContainer.className = 'flex flex-row items-start gap-4 border-t-[2px] border-indigo-500/30 pt-6 shrink-0';
 
                 // Llamada recursiva para renderizar los hijos
                 node.children.forEach(child => {
@@ -216,11 +216,11 @@
                     if (isOpen) {
                         childrenWrapper.classList.remove(...closedClasses);
                         childrenWrapper.classList.add(...openClasses);
-                        iconSpan.innerHTML = `<i data-lucide="chevron-down" class="w-4 h-4"></i>`;
+                        iconSpan.innerHTML = `<i data-lucide="chevron-up" class="w-4 h-4"></i>`;
                     } else {
                         childrenWrapper.classList.remove(...openClasses);
                         childrenWrapper.classList.add(...closedClasses);
-                        iconSpan.innerHTML = `<i data-lucide="chevron-right" class="w-4 h-4"></i>`;
+                        iconSpan.innerHTML = `<i data-lucide="chevron-down" class="w-4 h-4"></i>`;
                     }
                     lucide.createIcons(); // Recargar iconos después del cambio de HTML
                 });
