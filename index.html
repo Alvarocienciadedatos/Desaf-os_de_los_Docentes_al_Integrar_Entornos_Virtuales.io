@@ -30,30 +30,30 @@
 <body class="bg-slate-900 select-none text-slate-200">
 
     <!-- Cabecera Fija con Imagen Temática -->
-    <header class="fixed top-0 left-0 w-full z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-xl px-6 py-4 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 border-2 border-slate-600 shadow-inner hidden sm:block">
-                <!-- Imagen temática de Unsplash con texto alternativo solicitado -->
-                <img 
-                    src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=200&q=80" 
-                    alt="" 
-                    class="w-full h-full object-cover"
-                >
-            </div>
-            <div>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-100 flex items-center gap-2">
-                    <i data-lucide="network" class="w-6 h-6 text-indigo-400"></i>
-                    Mapa Conceptual: Retos EVA
-                </h1>
-                <p class="text-sm text-slate-400 mt-0.5">Desafíos de los Docentes al Integrar Entornos Virtuales de Aprendizaje</p>
-            </div>
+    <header class="fixed top-0 left-0 w-full z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-xl px-4 py-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-center sm:text-left relative">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 border-slate-600 shadow-inner">
+            <!-- Imagen temática de Unsplash con texto alternativo solicitado -->
+            <img 
+                src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=200&q=80" 
+                alt="" 
+                class="w-full h-full object-cover"
+            >
         </div>
-        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-300 text-sm font-medium shadow-lg shadow-indigo-900/20">
+        <div class="flex flex-col items-center sm:items-start">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 flex items-center gap-2">
+                <i data-lucide="network" class="w-7 h-7 sm:w-8 sm:h-8 text-indigo-400"></i>
+                Mapa Conceptual: Retos EVA
+            </h1>
+            <p class="text-base sm:text-lg text-slate-400 mt-1 font-medium">Desafíos de los Docentes al Integrar Entornos Virtuales de Aprendizaje</p>
+        </div>
+        <div class="absolute right-6 top-1/2 -translate-y-1/2 hidden xl:flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-300 text-sm font-medium shadow-lg shadow-indigo-900/20">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
             Potenciado por Gemini AI
         </div>
     </header>
 
+    <!-- Panel de Controles Flotante -->
+    <div class="absolute top-36 left-6 z-40 bg-slate-800/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-700 flex flex-col gap-2">
     <!-- Panel de Controles Flotante -->
     <div class="absolute top-28 left-6 z-40 bg-slate-800/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-700 flex flex-col gap-2">
         <button id="btn-zoom-in" title="Acercar" class="p-2.5 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-indigo-400 transition-colors cursor-pointer">
@@ -70,7 +70,7 @@
     </div>
 
     <!-- Etiqueta de Instrucciones -->
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-sm text-slate-300 bg-slate-800/90 backdrop-blur-md px-6 py-3 rounded-3xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium text-center">
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-base text-slate-300 bg-slate-800/90 backdrop-blur-md px-6 py-3 rounded-3xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium text-center">
         <span class="flex items-center gap-2">👆 Haz clic para expandir ramas</span>
         <span class="hidden sm:block text-slate-600">|</span>
         <span class="flex items-center gap-2">✨ Toca los retos finales para pedir soluciones a la IA</span>
@@ -79,7 +79,7 @@
     </div>
 
     <!-- Lienzo Arrastrable (Canvas) -->
-    <div id="canvas-container" class="w-full h-full cursor-grab pt-24">
+    <div id="canvas-container" class="w-full h-full cursor-grab pt-32">
         <div id="mindmap-root" class="origin-top-left transition-transform duration-75 ease-linear p-10 flex justify-center min-w-max">
             <!-- El árbol se renderizará aquí dinámicamente -->
         </div>
@@ -373,10 +373,11 @@
         ];
 
         // === LÓGICA DE RENDERIZADO DEL ÁRBOL ===
-        function createNodeElement(node, level = 0, childIndex = 0, passedTheme = null) {
+        function createNodeElement(node, level = 0, childIndex = 0, passedTheme = null, onOpen = null) {
             const hasChildren = node.children && node.children.length > 0;
             const isRoot = level === 0;
             let isOpen = level < 1; 
+            let closeSelf = null;
 
             // Determinar el tema de color para la rama
             let theme = passedTheme;
@@ -394,7 +395,7 @@
             // Línea vertical entrante
             if (!isRoot) {
                 const incomingLine = document.createElement('div');
-                incomingLine.className = `w-[2px] h-8 ${lineColorClass} shrink-0 transition-colors duration-300`;
+                incomingLine.className = `w-[2px] h-10 ${lineColorClass} shrink-0 transition-colors duration-300`;
                 branchContainer.appendChild(incomingLine);
             }
 
@@ -402,15 +403,15 @@
             const card = document.createElement('div');
             
             // Estilos de la tarjeta basados en la jerarquía y el tema
-            let cardStyles = "mindmap-node relative flex items-center justify-between px-5 py-3 rounded-2xl border-[1.5px] transition-all duration-300 ease-in-out min-w-[220px] max-w-[320px] z-10 shrink-0 shadow-md cursor-pointer ";
+            let cardStyles = "mindmap-node relative flex items-center justify-between rounded-2xl border-[1.5px] transition-all duration-300 ease-in-out z-10 shrink-0 shadow-md cursor-pointer ";
             
             if (isRoot) {
-                cardStyles += "bg-gradient-to-b from-slate-700 to-slate-800 text-white text-xl font-bold shadow-xl border-slate-500";
+                cardStyles += "px-8 py-5 text-2xl md:text-3xl font-extrabold bg-gradient-to-b from-slate-700 to-slate-800 text-white shadow-xl border-slate-500 min-w-[280px]";
             } else if (level === 1) {
-                cardStyles += theme.main;
+                cardStyles += `px-6 py-4 text-lg md:text-xl font-bold ${theme.main} min-w-[250px] max-w-[360px]`;
             } else {
                 // Si es un nodo final (sin hijos), agregamos un hover especial
-                cardStyles += theme.child;
+                cardStyles += `px-5 py-3 text-base md:text-lg font-medium ${theme.child} min-w-[220px] max-w-[320px]`;
                 if (!hasChildren) {
                     cardStyles += " hover:-translate-y-1";
                 }
@@ -423,13 +424,13 @@
             let iconSpan = document.createElement('span');
             if (hasChildren) {
                 const iconColors = isRoot ? 'bg-white/20 text-white' : `${theme.iconBg} ${theme.iconText}`;
-                iconSpan.className = `ml-3 flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full transition-colors ${iconColors}`;
-                iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>`;
+                iconSpan.className = `ml-4 flex-shrink-0 flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full transition-colors ${iconColors}`;
+                iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5"></i>`;
             } else {
                 // Icono de destellos (✨) para los nodos hojas
-                iconSpan.className = `ml-3 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-indigo-500/20 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)] group transition-transform hover:scale-110`;
+                iconSpan.className = `ml-4 flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-500/20 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)] group transition-transform hover:scale-110`;
                 iconSpan.title = "Obtener soluciones con IA";
-                iconSpan.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i>`;
+                iconSpan.innerHTML = `<i data-lucide="sparkles" class="w-5 h-5"></i>`;
             }
             card.appendChild(iconSpan);
             branchContainer.appendChild(card);
@@ -445,18 +446,42 @@
                 if (isOpen) childrenWrapper.classList.add(...openClasses);
                 else childrenWrapper.classList.add(...closedClasses);
 
+                // Función interna para cerrar este nodo desde afuera (acordeón)
+                closeSelf = () => {
+                    if (!isOpen) return;
+                    isOpen = false;
+                    childrenWrapper.classList.remove(...openClasses);
+                    childrenWrapper.classList.add(...closedClasses);
+                    iconSpan.innerHTML = `<i data-lucide="chevron-down" class="w-5 h-5"></i>`;
+                    lucide.createIcons();
+                };
+
                 // Línea saliente
                 const outgoingLine = document.createElement('div');
-                outgoingLine.className = `w-[2px] h-8 ${lineColorClass} shrink-0 transition-colors duration-300`;
+                outgoingLine.className = `w-[2px] h-10 ${lineColorClass} shrink-0 transition-colors duration-300`;
                 childrenWrapper.appendChild(outgoingLine);
 
                 // Contenedor con borde superior para los hijos
                 const childrenListContainer = document.createElement('div');
-                childrenListContainer.className = `flex flex-row items-start gap-4 border-t-[2px] ${lineColorClass} pt-6 shrink-0 transition-colors duration-300`;
+                childrenListContainer.className = `flex flex-row items-start gap-5 md:gap-8 border-t-[2px] ${lineColorClass} pt-8 shrink-0 transition-colors duration-300`;
+
+                // Mantener referencia de cómo cerrar a cada hijo (para el acordeón interno)
+                const childCloseFuncs = [];
 
                 // Llamada recursiva
                 node.children.forEach((child, index) => {
-                    childrenListContainer.appendChild(createNodeElement(child, level + 1, index, theme));
+                    const onChildOpen = () => {
+                        // Comportamiento de ACORDEÓN: Cerramos a los otros hermanos
+                        childCloseFuncs.forEach((fn, i) => {
+                            if (i !== index && fn) {
+                                fn();
+                            }
+                        });
+                    };
+
+                    const childResult = createNodeElement(child, level + 1, index, theme, onChildOpen);
+                    childrenListContainer.appendChild(childResult.element);
+                    childCloseFuncs.push(childResult.closeSelf);
                 });
 
                 childrenWrapper.appendChild(childrenListContainer);
@@ -464,17 +489,19 @@
 
                 // Evento Clic para colapsar/expandir
                 card.addEventListener('click', (e) => {
-                    isOpen = !isOpen;
                     if (isOpen) {
+                        closeSelf(); // Si estaba abierto, simplemente lo cerramos
+                    } else {
+                        isOpen = true; // Si estaba cerrado, lo abrimos
                         childrenWrapper.classList.remove(...closedClasses);
                         childrenWrapper.classList.add(...openClasses);
-                        iconSpan.innerHTML = `<i data-lucide="chevron-up" class="w-4 h-4"></i>`;
-                    } else {
-                        childrenWrapper.classList.remove(...openClasses);
-                        childrenWrapper.classList.add(...closedClasses);
-                        iconSpan.innerHTML = `<i data-lucide="chevron-down" class="w-4 h-4"></i>`;
+                        iconSpan.innerHTML = `<i data-lucide="chevron-up" class="w-5 h-5"></i>`;
+                        
+                        // Y notificamos al padre para que cierre a nuestros hermanos
+                        if (onOpen) onOpen();
+                        
+                        lucide.createIcons();
                     }
-                    lucide.createIcons();
                 });
             } else {
                 // Evento clic para nodos hoja -> Abre Modal de IA
@@ -483,18 +510,19 @@
                 });
             }
 
-            return branchContainer;
+            // Retornamos el elemento y la función que permite cerrarlo
+            return { element: branchContainer, closeSelf };
         }
 
-        // Renderizar el árbol
+        // Renderizar el árbol (usamos .element porque ahora devuelve un objeto)
         const mindmapRoot = document.getElementById('mindmap-root');
-        mindmapRoot.appendChild(createNodeElement(mindMapData));
+        mindmapRoot.appendChild(createNodeElement(mindMapData).element);
         
         lucide.createIcons();
 
         // === LÓGICA DE MOVIMIENTO Y ZOOM ===
         let scale = 0.85;
-        let position = { x: 50, y: 120 };
+        let position = { x: 50, y: 150 };
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
 
@@ -549,7 +577,7 @@
 
         document.getElementById('btn-reset').addEventListener('click', () => {
             scale = 0.85;
-            position = { x: 50, y: 120 };
+            position = { x: 50, y: 150 };
             updateTransform();
         });
 
