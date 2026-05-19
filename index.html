@@ -25,6 +25,19 @@
             50% { opacity: 0.7; text-shadow: 0 0 20px rgba(167, 139, 250, 0.8); }
         }
         .ai-loading { animation: pulse-glow 1.5s ease-in-out infinite; }
+
+        /* Estilos para el scroll del chat */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 4px;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body class="bg-slate-900 select-none text-slate-200">
@@ -32,7 +45,6 @@
     <!-- Cabecera Fija con Imagen Temática -->
     <header class="fixed top-0 left-0 w-full z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-xl px-4 py-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-center sm:text-left relative">
         <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 border-slate-600 shadow-inner">
-            <!-- Imagen temática de Unsplash con texto alternativo solicitado -->
             <img 
                 src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=200&q=80" 
                 alt="" 
@@ -47,15 +59,13 @@
             <p class="text-base sm:text-lg text-slate-400 mt-1 font-medium">Desafíos de los Docentes al Integrar Entornos Virtuales de Aprendizaje</p>
         </div>
         <div class="absolute right-6 top-1/2 -translate-y-1/2 hidden xl:flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-300 text-sm font-medium shadow-lg shadow-indigo-900/20">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
             Potenciado por Gemini AI
         </div>
     </header>
 
-    <!-- Panel de Controles Flotante -->
+    <!-- Panel de Controles Flotante (Izquierda) -->
     <div class="absolute top-36 left-6 z-40 bg-slate-800/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-700 flex flex-col gap-2">
-    <!-- Panel de Controles Flotante -->
-    <div class="absolute top-28 left-6 z-40 bg-slate-800/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-700 flex flex-col gap-2">
         <button id="btn-zoom-in" title="Acercar" class="p-2.5 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-indigo-400 transition-colors cursor-pointer">
             <i data-lucide="zoom-in" class="w-[22px] h-[22px]"></i>
         </button>
@@ -67,16 +77,28 @@
         <button id="btn-reset" title="Restablecer vista" class="p-2.5 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-indigo-400 transition-colors cursor-pointer">
             <i data-lucide="maximize" class="w-[22px] h-[22px]"></i>
         </button>
+        <div class="w-full h-px bg-slate-700"></div>
+        <!-- NUEVO BOTÓN LLM: Generar Plan Maestro -->
+        <button id="btn-master-plan" title="✨ Generar Plan Institucional" class="p-2.5 hover:bg-indigo-900/60 rounded-xl text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer relative group">
+            <i data-lucide="wand-2" class="w-[22px] h-[22px]"></i>
+            <span class="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-indigo-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity shadow-lg">✨ Crear Plan Maestro</span>
+        </button>
     </div>
 
     <!-- Etiqueta de Instrucciones -->
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-base text-slate-300 bg-slate-800/90 backdrop-blur-md px-6 py-3 rounded-3xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium text-center">
-        <span class="flex items-center gap-2">👆 Haz clic para expandir ramas</span>
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-base text-slate-300 bg-slate-800/90 backdrop-blur-md px-6 py-3 rounded-3xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium text-center">
+        <span class="flex items-center gap-2">👆 Clic para expandir</span>
         <span class="hidden sm:block text-slate-600">|</span>
-        <span class="flex items-center gap-2">✨ Toca los retos finales para pedir soluciones a la IA</span>
+        <span class="flex items-center gap-2 text-indigo-200">✨ Toca los retos para soluciones IA</span>
         <span class="hidden sm:block text-slate-600">|</span>
         <span class="flex items-center gap-2">🖐️ Arrastra el fondo</span>
     </div>
+
+    <!-- Botón Flotante Chatbot (Derecha Abajo) -->
+    <button id="btn-open-chat" class="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-full p-4 shadow-xl shadow-indigo-900/50 transition-transform hover:scale-110 flex items-center justify-center group cursor-pointer border border-indigo-400/30">
+        <i data-lucide="bot" class="w-6 h-6"></i>
+        <span class="absolute -top-12 bg-slate-800 text-indigo-200 text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700 whitespace-nowrap shadow-lg">✨ Consultar al Mentor EdTech</span>
+    </button>
 
     <!-- Lienzo Arrastrable (Canvas) -->
     <div id="canvas-container" class="w-full h-full cursor-grab pt-32">
@@ -85,15 +107,13 @@
         </div>
     </div>
 
-    <!-- Modal de Inteligencia Artificial (Gemini) -->
+    <!-- Modal 1: Soluciones por Nodo (Existente Mejorado) -->
     <div id="ai-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-slate-800 border border-indigo-500/40 rounded-2xl shadow-2xl max-w-lg w-full flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="ai-modal-panel">
-            
-            <!-- Modal Header -->
             <div class="bg-gradient-to-r from-slate-800 to-slate-750 px-6 py-4 border-b border-slate-700 flex justify-between items-start gap-4">
                 <div>
                     <div class="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">
-                        <i data-lucide="bot" class="w-4 h-4"></i> Asistente Pedagógico
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Asistente de Estrategias
                     </div>
                     <h3 id="modal-title" class="text-lg sm:text-xl font-bold text-slate-100 leading-tight">Título del Reto</h3>
                 </div>
@@ -101,40 +121,111 @@
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            
-            <!-- Modal Body -->
-            <div class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[60vh] select-text">
+            <div class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[60vh] select-text chat-scroll">
                 <div id="modal-content" class="text-slate-300 text-sm leading-relaxed space-y-3">
-                    <p>La Inteligencia Artificial de Gemini puede analizar este desafío específico y proporcionarte <strong>estrategias prácticas</strong> para superarlo en tu entorno virtual.</p>
+                    <p>Gemini analizará este desafío y te dará <strong>estrategias prácticas</strong>. ¿Qué formato prefieres?</p>
                 </div>
             </div>
-            
-            <!-- Modal Footer -->
-            <div class="p-4 bg-slate-800/50 border-t border-slate-700 flex justify-end">
-                <button id="btn-generate-ai" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-900/30 cursor-pointer group w-full sm:w-auto justify-center">
-                    <i data-lucide="sparkles" class="w-4 h-4 text-indigo-200 group-hover:text-white group-hover:animate-spin-slow"></i>
-                    <span id="btn-generate-text">✨ Generar Soluciones</span>
+            <div class="p-4 bg-slate-800/50 border-t border-slate-700 flex flex-col sm:flex-row gap-2 justify-end" id="modal-actions">
+                <button onclick="generateNodeSolution('lista')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl font-medium flex items-center justify-center gap-2 transition-all cursor-pointer text-sm">
+                    ✨ Viñetas
+                </button>
+                <button onclick="generateNodeSolution('pasos')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-900/30 cursor-pointer text-sm">
+                    ✨ Paso a Paso
                 </button>
             </div>
         </div>
     </div>
 
-    <script>
-        // === CONFIGURACIÓN DE GEMINI API ===
-        const apiKey = ""; // La plataforma inyectará la key automáticamente
+    <!-- Modal 2: Plan Maestro Institucional (Nuevo) -->
+    <div id="master-plan-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-800 border border-purple-500/40 rounded-2xl shadow-2xl max-w-3xl w-full flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 max-h-[90vh]" id="master-plan-panel">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-750 px-6 py-4 border-b border-slate-700 flex justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-purple-500/20 rounded-lg text-purple-400">
+                        <i data-lucide="wand-2" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-100">Plan Maestro Institucional</h3>
+                        <p class="text-xs text-purple-300 opacity-80">Generado dinámicamente con Gemini AI</p>
+                    </div>
+                </div>
+                <button id="close-master-plan" class="text-slate-400 hover:text-rose-400 hover:bg-slate-700 p-1.5 rounded-lg transition-colors shrink-0 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="master-plan-content" class="p-6 overflow-y-auto select-text chat-scroll text-slate-300 text-sm md:text-base leading-relaxed bg-slate-800/50">
+                <div class="flex flex-col items-center justify-center py-12 gap-4">
+                    <i data-lucide="sparkles" class="w-12 h-12 text-purple-400 ai-loading"></i>
+                    <p class="text-purple-300 font-medium animate-pulse text-center">Analizando el mapa conceptual completo y diseñando el plan estratégico...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Lateral: Chatbot Mentor EdTech (Nuevo) -->
+    <div id="chat-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-slate-800 border-l border-slate-700 shadow-2xl z-[70] transform translate-x-full transition-transform duration-300 flex flex-col">
+        <!-- Chat Header -->
+        <div class="px-5 py-4 border-b border-slate-700 bg-slate-800/95 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                        <i data-lucide="bot" class="w-6 h-6"></i>
+                    </div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-800"></div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-100 leading-tight">Mentor EdTech ✨</h3>
+                    <p class="text-xs text-slate-400">Gemini AI Assistant</p>
+                </div>
+            </div>
+            <button id="close-chat" class="text-slate-400 hover:text-rose-400 hover:bg-slate-700 p-2 rounded-xl transition-colors cursor-pointer">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
+        </div>
         
-        // Función de delay para el backoff exponencial
+        <!-- Chat Messages Container -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 chat-scroll bg-slate-900/50">
+            <!-- Mensaje de bienvenida -->
+            <div class="flex gap-3 max-w-[85%]">
+                <div class="w-8 h-8 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center justify-center shrink-0 mt-1">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                </div>
+                <div class="bg-slate-700 text-slate-200 p-3 rounded-2xl rounded-tl-none text-sm shadow-sm border border-slate-600">
+                    ¡Hola! Soy tu Mentor EdTech. Analizo los retos de este mapa conceptual. ¿Sobre qué categoría te gustaría profundizar o pedir consejos?
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Input Area -->
+        <div class="p-4 bg-slate-800 border-t border-slate-700 shrink-0">
+            <form id="chat-form" class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Escribe tu pregunta aquí..." class="flex-1 bg-slate-900 border border-slate-600 text-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-500">
+                <button type="submit" id="btn-send-chat" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2.5 rounded-xl transition-colors cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay oscuro para el chat en móviles -->
+    <div id="chat-overlay" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-[65] hidden opacity-0 transition-opacity duration-300"></div>
+
+
+    <script>
+        // === CONFIGURACIÓN GLOBAL Y GEMINI API ===
+        const apiKey = ""; 
         const delay = ms => new Promise(res => setTimeout(res, ms));
 
-        // Llamada a la API con reintentos
-        async function fetchGeminiConReintentos(promptText, retries = 5) {
+        // Función unificada para llamar a Gemini (soporta un solo prompt o un historial de chat)
+        async function fetchGeminiConReintentos(contentsArray, systemInstructionText, retries = 5) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const delays = [1000, 2000, 4000, 8000, 16000];
 
             const payload = {
-                contents: [{ parts: [{ text: promptText }] }],
+                contents: contentsArray,
                 systemInstruction: { 
-                    parts: [{ text: "Eres un asesor pedagógico experto en tecnología educativa (EdTech). Tu objetivo es dar consejos prácticos, breves y directamente aplicables para profesores. Responde con un tono motivador y profesional. Utiliza formato Markdown (negritas, viñetas) para hacer la lectura fácil." }] 
+                    parts: [{ text: systemInstructionText }] 
                 }
             };
 
@@ -146,10 +237,7 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
                     return data.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar una respuesta.";
                 } catch (error) {
@@ -159,250 +247,254 @@
             }
         }
 
-        // Analizador simple de Markdown a HTML (para viñetas y negritas)
+        // Analizador de Markdown mejorado
         function parseSimpleMarkdown(text) {
             let html = text
-                // Negritas
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-300 font-bold">$1</strong>')
-                // Saltos de línea dobles a párrafos
-                .split('\n\n').map(p => {
-                    // Si es una lista
-                    if (p.includes('\n* ') || p.startsWith('* ')) {
-                        let items = p.split('\n').filter(item => item.trim().startsWith('*'));
-                        let listHtml = '<ul class="list-none space-y-2 mt-2">';
-                        items.forEach(item => {
-                            let content = item.replace(/^\*\s*/, '');
-                            listHtml += `<li class="flex gap-2 items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0"></i> <span>${content}</span></li>`;
-                        });
-                        listHtml += '</ul>';
-                        return listHtml;
-                    }
-                    return `<p class="mb-3">${p}</p>`;
-                }).join('');
-            
-            return html;
+                .replace(/### (.*)/g, '<h3 class="text-lg font-bold text-indigo-300 mt-4 mb-2">$1</h3>')
+                .replace(/## (.*)/g, '<h2 class="text-xl font-bold text-indigo-400 mt-5 mb-2">$1</h2>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-200 font-bold">$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em class="text-indigo-200 italic">$1</em>');
+
+            return html.split('\n\n').map(p => {
+                if (p.trim().startsWith('* ')) {
+                    let items = p.split('\n').filter(item => item.trim().startsWith('*'));
+                    let listHtml = '<ul class="list-none space-y-2 mt-2 mb-4">';
+                    items.forEach(item => {
+                        let content = item.replace(/^\*\s*/, '');
+                        listHtml += `<li class="flex gap-2 items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 mt-1 shrink-0"></i> <span>${content}</span></li>`;
+                    });
+                    listHtml += '</ul>';
+                    return listHtml;
+                } else if (p.trim().startsWith('<h')) {
+                    return p;
+                }
+                return `<p class="mb-3">${p}</p>`;
+            }).join('');
         }
 
+        // === DATOS DEL MAPA CONCEPTUAL ===
+        const mindMapData = {
+            id: 'root', label: 'Desafíos al Integrar EVA',
+            children: [
+                { id: '1', label: 'Competencias Digitales Insuficientes', children: [{ id: '1-1', label: 'Falta de formación en plataformas' }, { id: '1-2', label: 'Dificultades en recursos multimedia' }, { id: '1-3', label: 'Inseguridad con herramientas' }] },
+                { id: '2', label: 'Sobrecarga de Trabajo', children: [{ id: '2-1', label: 'Demanda constante de retroalimentación' }, { id: '2-2', label: 'Preparación de materiales digitales' }, { id: '2-3', label: 'Aumento del tiempo de planificación' }] },
+                { id: '3', label: 'Dificultades en Diseño Pedagógico', children: [{ id: '3-1', label: 'Transformación de presencial a virtual' }, { id: '3-2', label: 'Falta de interactividad y dinamismo' }, { id: '3-3', label: 'Predominio del modelo transmisivo' }] },
+                { id: '4', label: 'Infraestructura Tecnológica Limitada', children: [{ id: '4-1', label: 'Conexiones inestables' }, { id: '4-2', label: 'Equipos obsoletos' }, { id: '4-3', label: 'Falta de apoyo técnico institucional' }] },
+                { id: '5', label: 'Baja Participación Estudiantil', children: [{ id: '5-1', label: 'Desmotivación' }, { id: '5-2', label: 'Escasa interacción' }, { id: '5-3', label: 'Ausencia en actividades síncronas' }] },
+                { id: '6', label: 'Retos en la Evaluación en Línea', children: [{ id: '6-1', label: 'Validación de la autenticidad' }, { id: '6-2', label: 'Dificultad para evaluación formativa' }, { id: '6-3', label: 'Retraso en retroalimentación' }] },
+                { id: '7', label: 'Gestión del Tiempo', children: [{ id: '7-1', label: 'Disponibilidad extendida' }, { id: '7-2', label: 'Desbalance vida laboral-personal' }] },
+                { id: '8', label: 'Resistencia al Cambio', children: [{ id: '8-1', label: 'Dudas sobre efectividad virtual' }, { id: '8-2', label: 'Resistencia a modificar prácticas' }] },
+                { id: '9', label: 'Falta de Apoyo Institucional', children: [{ id: '9-1', label: 'Escasa capacitación continua' }, { id: '9-2', label: 'Limitado acompañamiento técnico' }, { id: '9-3', label: 'Ausencia de políticas claras' }] }
+            ]
+        };
 
-        // === LÓGICA DEL MODAL ===
+        // Extraer resumen para los prompts
+        const mapaResumen = mindMapData.children.map(c => `- ${c.label}: ${c.children.map(sub => sub.label).join(', ')}`).join('\n');
+
+        // === 1. LÓGICA DEL MODAL DE NODO INDIVIDUAL ===
         const modal = document.getElementById('ai-modal');
         const modalPanel = document.getElementById('ai-modal-panel');
         const modalTitle = document.getElementById('modal-title');
         const modalContent = document.getElementById('modal-content');
-        const btnGenerate = document.getElementById('btn-generate-ai');
-        const btnGenerateText = document.getElementById('btn-generate-text');
-        const btnCloseModal = document.getElementById('close-modal');
-        
+        const modalActions = document.getElementById('modal-actions');
         let currentChallenge = "";
 
         function openModal(challengeName) {
             currentChallenge = challengeName;
             modalTitle.textContent = challengeName;
+            modalContent.innerHTML = `<p>Gemini analizará este desafío y te dará <strong>estrategias prácticas</strong>. ¿Qué formato prefieres?</p>`;
+            modalActions.style.display = 'flex';
             
-            // Resetear contenido
-            modalContent.innerHTML = `<p>La Inteligencia Artificial de Gemini puede analizar este desafío específico y proporcionarte <strong>estrategias prácticas</strong> para superarlo en tu entorno virtual.</p>`;
-            btnGenerate.style.display = 'flex';
-            btnGenerateText.textContent = '✨ Generar Soluciones';
-            btnGenerate.disabled = false;
-            btnGenerate.classList.remove('opacity-70', 'cursor-not-allowed');
-            
-            // Mostrar modal
             modal.classList.remove('hidden');
-            // Pequeño delay para la animación de opacidad y escala
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalPanel.classList.remove('scale-95');
-            }, 10);
-            
-            lucide.createIcons();
+            setTimeout(() => { modal.classList.remove('opacity-0'); modalPanel.classList.remove('scale-95'); }, 10);
         }
 
-        function closeModal() {
-            modal.classList.add('opacity-0');
-            modalPanel.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        btnCloseModal.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+        document.getElementById('close-modal').addEventListener('click', () => {
+            modal.classList.add('opacity-0'); modalPanel.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         });
 
-        // Evento para generar contenido AI
-        btnGenerate.addEventListener('click', async () => {
-            // Estado de carga
-            btnGenerate.disabled = true;
-            btnGenerate.classList.add('opacity-70', 'cursor-not-allowed');
-            btnGenerateText.textContent = 'Pensando...';
-            
+        async function generateNodeSolution(formato) {
+            modalActions.style.display = 'none';
             modalContent.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-8 gap-4">
-                    <div class="relative">
-                        <i data-lucide="sparkles" class="w-10 h-10 text-indigo-400 ai-loading"></i>
-                    </div>
-                    <p class="text-indigo-300 font-medium animate-pulse text-center">Consultando a Gemini para "<span class="text-white">${currentChallenge}</span>"...</p>
+                    <i data-lucide="sparkles" class="w-10 h-10 text-indigo-400 ai-loading"></i>
+                    <p class="text-indigo-300 font-medium animate-pulse text-center">Generando estrategias con Gemini...</p>
                 </div>
             `;
             lucide.createIcons();
 
-            try {
-                const prompt = `Un docente está teniendo este problema al enseñar en línea: "${currentChallenge}". 
-                Dame 3 consejos súper prácticos y directos que el profesor pueda aplicar hoy mismo para solucionar o mitigar este reto. 
-                Usa viñetas con asteriscos (*) para cada consejo.`;
-                
-                const aiResponse = await fetchGeminiConReintentos(prompt);
-                
-                // Procesar texto e inyectar
-                modalContent.innerHTML = `
-                    <div class="bg-indigo-900/20 border border-indigo-500/20 rounded-xl p-4">
-                        ${parseSimpleMarkdown(aiResponse)}
-                    </div>
-                `;
-                // Ocultar botón después de generar
-                btnGenerate.style.display = 'none';
+            let promptExtra = formato === 'lista' ? "Usa formato de viñetas breves." : "Dame una guía paso a paso numerada (Paso 1, Paso 2, etc).";
+            let prompt = `El docente enfrenta este problema: "${currentChallenge}". Dame 3 estrategias súper prácticas aplicables hoy mismo. ${promptExtra}`;
+            let systemInst = "Eres un asesor pedagógico experto en EdTech. Sé motivador, directo y usa Markdown.";
 
+            try {
+                const aiResponse = await fetchGeminiConReintentos([{ role: "user", parts: [{ text: prompt }] }], systemInst);
+                modalContent.innerHTML = `<div class="bg-indigo-900/20 border border-indigo-500/20 rounded-xl p-4">${parseSimpleMarkdown(aiResponse)}</div>`;
             } catch (error) {
-                console.error("Error AI:", error);
-                modalContent.innerHTML = `
-                    <div class="bg-rose-900/20 border border-rose-500/20 text-rose-300 rounded-xl p-4 flex flex-col items-center text-center gap-2">
-                        <i data-lucide="alert-triangle" class="w-8 h-8 text-rose-400 mb-2"></i>
-                        <p><strong>Lo sentimos.</strong> No pudimos conectar con la IA en este momento.</p>
-                        <p class="text-xs opacity-80">Por favor, revisa tu conexión a internet o inténtalo más tarde.</p>
-                    </div>
-                `;
-                btnGenerateText.textContent = '✨ Reintentar';
-                btnGenerate.disabled = false;
-                btnGenerate.classList.remove('opacity-70', 'cursor-not-allowed');
+                modalContent.innerHTML = `<p class="text-rose-400 text-center">Error al conectar con la IA. Intenta de nuevo.</p>`;
+                modalActions.style.display = 'flex';
             }
-            
             lucide.createIcons();
+        }
+
+        // === 2. LÓGICA DEL PLAN MAESTRO (NUEVA FUNCIÓN IA) ===
+        const btnMasterPlan = document.getElementById('btn-master-plan');
+        const modalMasterPlan = document.getElementById('master-plan-modal');
+        const panelMasterPlan = document.getElementById('master-plan-panel');
+        const contentMasterPlan = document.getElementById('master-plan-content');
+
+        btnMasterPlan.addEventListener('click', async () => {
+            // Mostrar modal
+            modalMasterPlan.classList.remove('hidden');
+            contentMasterPlan.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 gap-4">
+                    <i data-lucide="sparkles" class="w-12 h-12 text-purple-400 ai-loading"></i>
+                    <p class="text-purple-300 font-medium animate-pulse text-center">Analizando el mapa conceptual completo y diseñando el plan estratégico...</p>
+                </div>
+            `;
+            setTimeout(() => { modalMasterPlan.classList.remove('opacity-0'); panelMasterPlan.classList.remove('scale-95'); }, 10);
+            lucide.createIcons();
+
+            const prompt = `Basado en todos los retos del mapa conceptual:\n${mapaResumen}\n\nGenera un "Plan de Acción Institucional Maestro" para directivos académicos. Divide el plan en 3 fases claras (Corto, Mediano y Largo plazo). Usa Markdown profesional.`;
+            const systemInst = "Eres un consultor estratégico de Educación Superior. Crea planes estructurados y visionarios.";
+
+            try {
+                const aiResponse = await fetchGeminiConReintentos([{ role: "user", parts: [{ text: prompt }] }], systemInst);
+                contentMasterPlan.innerHTML = parseSimpleMarkdown(aiResponse);
+            } catch (error) {
+                contentMasterPlan.innerHTML = `<p class="text-rose-400 text-center py-10">Fallo de conexión. Intenta de nuevo.</p>`;
+            }
+        });
+
+        document.getElementById('close-master-plan').addEventListener('click', () => {
+            modalMasterPlan.classList.add('opacity-0'); panelMasterPlan.classList.add('scale-95');
+            setTimeout(() => { modalMasterPlan.classList.add('hidden'); }, 300);
+        });
+
+        // === 3. LÓGICA DEL CHATBOT MENTOR EDTECH (NUEVA FUNCIÓN IA) ===
+        const btnOpenChat = document.getElementById('btn-open-chat');
+        const chatSidebar = document.getElementById('chat-sidebar');
+        const chatOverlay = document.getElementById('chat-overlay');
+        const btnCloseChat = document.getElementById('close-chat');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const btnSendChat = document.getElementById('btn-send-chat');
+
+        let chatHistory = [];
+        const chatSystemInstruction = `Eres 'Mentor EdTech', un asistente amigable y experto que ayuda a profesores a superar los retos de la educación virtual. 
+El usuario está viendo un mapa conceptual con estos problemas: \n${mapaResumen}\n
+Responde de forma muy concisa, empática y siempre relacionada con la integración de Entornos Virtuales de Aprendizaje (EVA). Usa emojis ocasionalmente.`;
+
+        function toggleChat(show) {
+            if (show) {
+                chatOverlay.classList.remove('hidden');
+                setTimeout(() => chatOverlay.classList.remove('opacity-0'), 10);
+                chatSidebar.classList.remove('translate-x-full');
+                chatInput.focus();
+            } else {
+                chatOverlay.classList.add('opacity-0');
+                chatSidebar.classList.add('translate-x-full');
+                setTimeout(() => chatOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        btnOpenChat.addEventListener('click', () => toggleChat(true));
+        btnCloseChat.addEventListener('click', () => toggleChat(false));
+        chatOverlay.addEventListener('click', () => toggleChat(false));
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `flex gap-3 max-w-[85%] ${role === 'user' ? 'self-end flex-row-reverse' : ''}`;
+            
+            const iconHtml = role === 'user' 
+                ? `<div class="w-8 h-8 rounded-full bg-slate-600 text-slate-300 flex items-center justify-center shrink-0 mt-1"><i data-lucide="user" class="w-4 h-4"></i></div>`
+                : `<div class="w-8 h-8 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center justify-center shrink-0 mt-1"><i data-lucide="bot" class="w-4 h-4"></i></div>`;
+            
+            const bubbleStyle = role === 'user'
+                ? `bg-indigo-600 text-white rounded-tr-none border-indigo-500`
+                : `bg-slate-700 text-slate-200 rounded-tl-none border-slate-600`;
+
+            div.innerHTML = `
+                ${iconHtml}
+                <div class="${bubbleStyle} p-3 rounded-2xl text-sm shadow-sm border">
+                    ${role === 'model' ? parseSimpleMarkdown(text) : text}
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            lucide.createIcons();
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Añadir a UI e historial
+            appendMessage('user', text);
+            chatHistory.push({ role: "user", parts: [{ text: text }] });
+            chatInput.value = '';
+            btnSendChat.disabled = true;
+
+            // Loading state
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = "flex gap-3 max-w-[85%]";
+            loadingDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center justify-center shrink-0 mt-1"><i data-lucide="sparkles" class="w-4 h-4 ai-loading"></i></div><div class="bg-slate-700 text-slate-400 p-3 rounded-2xl rounded-tl-none text-sm animate-pulse">Escribiendo...</div>`;
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            lucide.createIcons();
+
+            try {
+                const response = await fetchGeminiConReintentos(chatHistory, chatSystemInstruction);
+                chatMessages.removeChild(loadingDiv);
+                appendMessage('model', response);
+                chatHistory.push({ role: "model", parts: [{ text: response }] });
+            } catch (error) {
+                chatMessages.removeChild(loadingDiv);
+                appendMessage('model', "Lo siento, tuve un problema de conexión. ¿Puedes intentarlo de nuevo?");
+                chatHistory.pop(); // Eliminar el prompt fallido
+            } finally {
+                btnSendChat.disabled = false;
+                chatInput.focus();
+            }
         });
 
 
-        // === DATOS DEL MAPA CONCEPTUAL ===
-        const mindMapData = {
-            id: 'root',
-            label: 'Desafíos al Integrar EVA',
-            children: [
-                {
-                    id: '1', label: 'Competencias Digitales Insuficientes',
-                    children: [
-                        { id: '1-1', label: 'Falta de formación en plataformas' },
-                        { id: '1-2', label: 'Dificultades en recursos multimedia' },
-                        { id: '1-3', label: 'Inseguridad con herramientas' }
-                    ]
-                },
-                {
-                    id: '2', label: 'Sobrecarga de Trabajo',
-                    children: [
-                        { id: '2-1', label: 'Demanda constante de retroalimentación' },
-                        { id: '2-2', label: 'Preparación de materiales digitales' },
-                        { id: '2-3', label: 'Aumento del tiempo de planificación' }
-                    ]
-                },
-                {
-                    id: '3', label: 'Dificultades en Diseño Pedagógico',
-                    children: [
-                        { id: '3-1', label: 'Transformación de presencial a virtual' },
-                        { id: '3-2', label: 'Falta de interactividad y dinamismo' },
-                        { id: '3-3', label: 'Predominio del modelo transmisivo' }
-                    ]
-                },
-                {
-                    id: '4', label: 'Infraestructura Tecnológica Limitada',
-                    children: [
-                        { id: '4-1', label: 'Conexiones inestables' },
-                        { id: '4-2', label: 'Equipos obsoletos' },
-                        { id: '4-3', label: 'Falta de apoyo técnico institucional' }
-                    ]
-                },
-                {
-                    id: '5', label: 'Baja Participación Estudiantil',
-                    children: [
-                        { id: '5-1', label: 'Desmotivación' },
-                        { id: '5-2', label: 'Escasa interacción' },
-                        { id: '5-3', label: 'Ausencia en actividades síncronas' }
-                    ]
-                },
-                {
-                    id: '6', label: 'Retos en la Evaluación en Línea',
-                    children: [
-                        { id: '6-1', label: 'Validación de la autenticidad' },
-                        { id: '6-2', label: 'Dificultad para evaluación formativa' },
-                        { id: '6-3', label: 'Retraso en retroalimentación' }
-                    ]
-                },
-                {
-                    id: '7', label: 'Gestión del Tiempo',
-                    children: [
-                        { id: '7-1', label: 'Disponibilidad extendida' },
-                        { id: '7-2', label: 'Desbalance vida laboral-personal' }
-                    ]
-                },
-                {
-                    id: '8', label: 'Resistencia al Cambio',
-                    children: [
-                        { id: '8-1', label: 'Dudas sobre efectividad virtual' },
-                        { id: '8-2', label: 'Resistencia a modificar prácticas' }
-                    ]
-                },
-                {
-                    id: '9', label: 'Falta de Apoyo Institucional',
-                    children: [
-                        { id: '9-1', label: 'Escasa capacitación continua' },
-                        { id: '9-2', label: 'Limitado acompañamiento técnico' },
-                        { id: '9-3', label: 'Ausencia de políticas claras' }
-                    ]
-                }
-            ]
-        };
-
-        // === PALETA DE COLORES POR JERARQUÍA ===
+        // === LÓGICA DE RENDERIZADO DEL MAPA (MANTENIDA INTACTA) ===
         const colorThemes = [
-            { main: 'bg-emerald-900 text-emerald-100 border-emerald-600/60 hover:bg-emerald-800 hover:border-emerald-400 hover:shadow-emerald-900/50', child: 'bg-emerald-950/80 text-emerald-200 border-emerald-800/80 hover:bg-emerald-900 hover:border-emerald-600 hover:shadow-emerald-900/50', line: 'bg-emerald-600/40', iconText: 'text-emerald-300', iconBg: 'bg-emerald-500/20' },
-            { main: 'bg-blue-900 text-blue-100 border-blue-600/60 hover:bg-blue-800 hover:border-blue-400 hover:shadow-blue-900/50', child: 'bg-blue-950/80 text-blue-200 border-blue-800/80 hover:bg-blue-900 hover:border-blue-600 hover:shadow-blue-900/50', line: 'bg-blue-600/40', iconText: 'text-blue-300', iconBg: 'bg-blue-500/20' },
-            { main: 'bg-purple-900 text-purple-100 border-purple-600/60 hover:bg-purple-800 hover:border-purple-400 hover:shadow-purple-900/50', child: 'bg-purple-950/80 text-purple-200 border-purple-800/80 hover:bg-purple-900 hover:border-purple-600 hover:shadow-purple-900/50', line: 'bg-purple-600/40', iconText: 'text-purple-300', iconBg: 'bg-purple-500/20' },
-            { main: 'bg-rose-900 text-rose-100 border-rose-600/60 hover:bg-rose-800 hover:border-rose-400 hover:shadow-rose-900/50', child: 'bg-rose-950/80 text-rose-200 border-rose-800/80 hover:bg-rose-900 hover:border-rose-600 hover:shadow-rose-900/50', line: 'bg-rose-600/40', iconText: 'text-rose-300', iconBg: 'bg-rose-500/20' },
-            { main: 'bg-amber-900 text-amber-100 border-amber-600/60 hover:bg-amber-800 hover:border-amber-400 hover:shadow-amber-900/50', child: 'bg-amber-950/80 text-amber-200 border-amber-800/80 hover:bg-amber-900 hover:border-amber-600 hover:shadow-amber-900/50', line: 'bg-amber-600/40', iconText: 'text-amber-300', iconBg: 'bg-amber-500/20' },
-            { main: 'bg-cyan-900 text-cyan-100 border-cyan-600/60 hover:bg-cyan-800 hover:border-cyan-400 hover:shadow-cyan-900/50', child: 'bg-cyan-950/80 text-cyan-200 border-cyan-800/80 hover:bg-cyan-900 hover:border-cyan-600 hover:shadow-cyan-900/50', line: 'bg-cyan-600/40', iconText: 'text-cyan-300', iconBg: 'bg-cyan-500/20' },
-            { main: 'bg-fuchsia-900 text-fuchsia-100 border-fuchsia-600/60 hover:bg-fuchsia-800 hover:border-fuchsia-400 hover:shadow-fuchsia-900/50', child: 'bg-fuchsia-950/80 text-fuchsia-200 border-fuchsia-800/80 hover:bg-fuchsia-900 hover:border-fuchsia-600 hover:shadow-fuchsia-900/50', line: 'bg-fuchsia-600/40', iconText: 'text-fuchsia-300', iconBg: 'bg-fuchsia-500/20' },
-            { main: 'bg-orange-900 text-orange-100 border-orange-600/60 hover:bg-orange-800 hover:border-orange-400 hover:shadow-orange-900/50', child: 'bg-orange-950/80 text-orange-200 border-orange-800/80 hover:bg-orange-900 hover:border-orange-600 hover:shadow-orange-900/50', line: 'bg-orange-600/40', iconText: 'text-orange-300', iconBg: 'bg-orange-500/20' },
-            { main: 'bg-teal-900 text-teal-100 border-teal-600/60 hover:bg-teal-800 hover:border-teal-400 hover:shadow-teal-900/50', child: 'bg-teal-950/80 text-teal-200 border-teal-800/80 hover:bg-teal-900 hover:border-teal-600 hover:shadow-teal-900/50', line: 'bg-teal-600/40', iconText: 'text-teal-300', iconBg: 'bg-teal-500/20' }
+            { main: 'bg-emerald-900 text-emerald-100 border-emerald-600/60 hover:bg-emerald-800 hover:border-emerald-400', child: 'bg-emerald-950/80 text-emerald-200 border-emerald-800/80 hover:bg-emerald-900', line: 'bg-emerald-600/40', iconText: 'text-emerald-300', iconBg: 'bg-emerald-500/20' },
+            { main: 'bg-blue-900 text-blue-100 border-blue-600/60 hover:bg-blue-800 hover:border-blue-400', child: 'bg-blue-950/80 text-blue-200 border-blue-800/80 hover:bg-blue-900', line: 'bg-blue-600/40', iconText: 'text-blue-300', iconBg: 'bg-blue-500/20' },
+            { main: 'bg-purple-900 text-purple-100 border-purple-600/60 hover:bg-purple-800 hover:border-purple-400', child: 'bg-purple-950/80 text-purple-200 border-purple-800/80 hover:bg-purple-900', line: 'bg-purple-600/40', iconText: 'text-purple-300', iconBg: 'bg-purple-500/20' },
+            { main: 'bg-rose-900 text-rose-100 border-rose-600/60 hover:bg-rose-800 hover:border-rose-400', child: 'bg-rose-950/80 text-rose-200 border-rose-800/80 hover:bg-rose-900', line: 'bg-rose-600/40', iconText: 'text-rose-300', iconBg: 'bg-rose-500/20' },
+            { main: 'bg-amber-900 text-amber-100 border-amber-600/60 hover:bg-amber-800 hover:border-amber-400', child: 'bg-amber-950/80 text-amber-200 border-amber-800/80 hover:bg-amber-900', line: 'bg-amber-600/40', iconText: 'text-amber-300', iconBg: 'bg-amber-500/20' },
+            { main: 'bg-cyan-900 text-cyan-100 border-cyan-600/60 hover:bg-cyan-800 hover:border-cyan-400', child: 'bg-cyan-950/80 text-cyan-200 border-cyan-800/80 hover:bg-cyan-900', line: 'bg-cyan-600/40', iconText: 'text-cyan-300', iconBg: 'bg-cyan-500/20' },
+            { main: 'bg-fuchsia-900 text-fuchsia-100 border-fuchsia-600/60 hover:bg-fuchsia-800 hover:border-fuchsia-400', child: 'bg-fuchsia-950/80 text-fuchsia-200 border-fuchsia-800/80 hover:bg-fuchsia-900', line: 'bg-fuchsia-600/40', iconText: 'text-fuchsia-300', iconBg: 'bg-fuchsia-500/20' },
+            { main: 'bg-orange-900 text-orange-100 border-orange-600/60 hover:bg-orange-800 hover:border-orange-400', child: 'bg-orange-950/80 text-orange-200 border-orange-800/80 hover:bg-orange-900', line: 'bg-orange-600/40', iconText: 'text-orange-300', iconBg: 'bg-orange-500/20' },
+            { main: 'bg-teal-900 text-teal-100 border-teal-600/60 hover:bg-teal-800 hover:border-teal-400', child: 'bg-teal-950/80 text-teal-200 border-teal-800/80 hover:bg-teal-900', line: 'bg-teal-600/40', iconText: 'text-teal-300', iconBg: 'bg-teal-500/20' }
         ];
 
-        // === LÓGICA DE RENDERIZADO DEL ÁRBOL ===
         function createNodeElement(node, level = 0, childIndex = 0, passedTheme = null, onOpen = null) {
             const hasChildren = node.children && node.children.length > 0;
             const isRoot = level === 0;
             let isOpen = level < 1; 
             let closeSelf = null;
 
-            // Determinar el tema de color para la rama
             let theme = passedTheme;
-            if (level === 1) {
-                // Asignar un color de la paleta según el índice del nodo
-                theme = colorThemes[childIndex % colorThemes.length];
-            }
+            if (level === 1) theme = colorThemes[childIndex % colorThemes.length];
 
-            // Clase para las líneas conectoras basada en el tema
             const lineColorClass = theme ? theme.line : 'bg-slate-600/50';
-
             const branchContainer = document.createElement('div');
             branchContainer.className = 'flex flex-col items-center';
 
-            // Línea vertical entrante
             if (!isRoot) {
                 const incomingLine = document.createElement('div');
                 incomingLine.className = `w-[2px] h-10 ${lineColorClass} shrink-0 transition-colors duration-300`;
                 branchContainer.appendChild(incomingLine);
             }
 
-            // Tarjeta del Nodo
             const card = document.createElement('div');
-            
-            // Estilos de la tarjeta basados en la jerarquía y el tema
             let cardStyles = "mindmap-node relative flex items-center justify-between rounded-2xl border-[1.5px] transition-all duration-300 ease-in-out z-10 shrink-0 shadow-md cursor-pointer ";
             
             if (isRoot) {
@@ -410,24 +502,19 @@
             } else if (level === 1) {
                 cardStyles += `px-6 py-4 text-lg md:text-xl font-bold ${theme.main} min-w-[250px] max-w-[360px]`;
             } else {
-                // Si es un nodo final (sin hijos), agregamos un hover especial
                 cardStyles += `px-5 py-3 text-base md:text-lg font-medium ${theme.child} min-w-[220px] max-w-[320px]`;
-                if (!hasChildren) {
-                    cardStyles += " hover:-translate-y-1";
-                }
+                if (!hasChildren) cardStyles += " hover:-translate-y-1 hover:border-indigo-400";
             }
             
             card.className = cardStyles;
             card.innerHTML = `<span class="leading-snug">${node.label}</span>`;
 
-            // Icono del Nodo (expandir/contraer o icono de IA para nodos finales)
             let iconSpan = document.createElement('span');
             if (hasChildren) {
                 const iconColors = isRoot ? 'bg-white/20 text-white' : `${theme.iconBg} ${theme.iconText}`;
                 iconSpan.className = `ml-4 flex-shrink-0 flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full transition-colors ${iconColors}`;
                 iconSpan.innerHTML = `<i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5"></i>`;
             } else {
-                // Icono de destellos (✨) para los nodos hojas
                 iconSpan.className = `ml-4 flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-500/20 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)] group transition-transform hover:scale-110`;
                 iconSpan.title = "Obtener soluciones con IA";
                 iconSpan.innerHTML = `<i data-lucide="sparkles" class="w-5 h-5"></i>`;
@@ -435,10 +522,8 @@
             card.appendChild(iconSpan);
             branchContainer.appendChild(card);
 
-            // Ramas hijas
             if (hasChildren) {
                 const childrenWrapper = document.createElement('div');
-                
                 const openClasses = ['max-w-[8000px]', 'max-h-[3000px]', 'opacity-100'];
                 const closedClasses = ['max-w-0', 'max-h-0', 'opacity-0'];
                 
@@ -446,7 +531,6 @@
                 if (isOpen) childrenWrapper.classList.add(...openClasses);
                 else childrenWrapper.classList.add(...closedClasses);
 
-                // Función interna para cerrar este nodo desde afuera (acordeón)
                 closeSelf = () => {
                     if (!isOpen) return;
                     isOpen = false;
@@ -456,29 +540,18 @@
                     lucide.createIcons();
                 };
 
-                // Línea saliente
                 const outgoingLine = document.createElement('div');
                 outgoingLine.className = `w-[2px] h-10 ${lineColorClass} shrink-0 transition-colors duration-300`;
                 childrenWrapper.appendChild(outgoingLine);
 
-                // Contenedor con borde superior para los hijos
                 const childrenListContainer = document.createElement('div');
                 childrenListContainer.className = `flex flex-row items-start gap-5 md:gap-8 border-t-[2px] ${lineColorClass} pt-8 shrink-0 transition-colors duration-300`;
 
-                // Mantener referencia de cómo cerrar a cada hijo (para el acordeón interno)
                 const childCloseFuncs = [];
-
-                // Llamada recursiva
                 node.children.forEach((child, index) => {
                     const onChildOpen = () => {
-                        // Comportamiento de ACORDEÓN: Cerramos a los otros hermanos
-                        childCloseFuncs.forEach((fn, i) => {
-                            if (i !== index && fn) {
-                                fn();
-                            }
-                        });
+                        childCloseFuncs.forEach((fn, i) => { if (i !== index && fn) fn(); });
                     };
-
                     const childResult = createNodeElement(child, level + 1, index, theme, onChildOpen);
                     childrenListContainer.appendChild(childResult.element);
                     childCloseFuncs.push(childResult.closeSelf);
@@ -487,37 +560,27 @@
                 childrenWrapper.appendChild(childrenListContainer);
                 branchContainer.appendChild(childrenWrapper);
 
-                // Evento Clic para colapsar/expandir
-                card.addEventListener('click', (e) => {
+                card.addEventListener('click', () => {
                     if (isOpen) {
-                        closeSelf(); // Si estaba abierto, simplemente lo cerramos
+                        closeSelf();
                     } else {
-                        isOpen = true; // Si estaba cerrado, lo abrimos
+                        isOpen = true; 
                         childrenWrapper.classList.remove(...closedClasses);
                         childrenWrapper.classList.add(...openClasses);
                         iconSpan.innerHTML = `<i data-lucide="chevron-up" class="w-5 h-5"></i>`;
-                        
-                        // Y notificamos al padre para que cierre a nuestros hermanos
                         if (onOpen) onOpen();
-                        
                         lucide.createIcons();
                     }
                 });
             } else {
-                // Evento clic para nodos hoja -> Abre Modal de IA
-                card.addEventListener('click', () => {
-                    openModal(node.label);
-                });
+                card.addEventListener('click', () => openModal(node.label));
             }
 
-            // Retornamos el elemento y la función que permite cerrarlo
             return { element: branchContainer, closeSelf };
         }
 
-        // Renderizar el árbol (usamos .element porque ahora devuelve un objeto)
         const mindmapRoot = document.getElementById('mindmap-root');
         mindmapRoot.appendChild(createNodeElement(mindMapData).element);
-        
         lucide.createIcons();
 
         // === LÓGICA DE MOVIMIENTO Y ZOOM ===
@@ -525,35 +588,24 @@
         let position = { x: 50, y: 150 };
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
-
         const canvasContainer = document.getElementById('canvas-container');
 
         function updateTransform() {
             mindmapRoot.style.transform = `translate(${position.x}px, ${position.y}px) scale(${scale})`;
         }
-
         updateTransform();
 
         canvasContainer.addEventListener('mousedown', (e) => {
-            // No arrastrar si hacemos clic en un nodo o en controles
             if (e.target.closest('.mindmap-node') || e.target.closest('button') || e.target.closest('header')) return;
-            
             isDragging = true;
             canvasContainer.classList.remove('cursor-grab');
             canvasContainer.classList.add('cursor-grabbing');
-            
-            dragStart = {
-                x: e.clientX - position.x,
-                y: e.clientY - position.y
-            };
+            dragStart = { x: e.clientX - position.x, y: e.clientY - position.y };
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            position = {
-                x: e.clientX - dragStart.x,
-                y: e.clientY - dragStart.y
-            };
+            position = { x: e.clientX - dragStart.x, y: e.clientY - dragStart.y };
             updateTransform();
         });
 
@@ -565,21 +617,9 @@
             }
         });
 
-        document.getElementById('btn-zoom-in').addEventListener('click', () => {
-            scale = Math.min(scale + 0.15, 2);
-            updateTransform();
-        });
-
-        document.getElementById('btn-zoom-out').addEventListener('click', () => {
-            scale = Math.max(scale - 0.15, 0.4);
-            updateTransform();
-        });
-
-        document.getElementById('btn-reset').addEventListener('click', () => {
-            scale = 0.85;
-            position = { x: 50, y: 150 };
-            updateTransform();
-        });
+        document.getElementById('btn-zoom-in').addEventListener('click', () => { scale = Math.min(scale + 0.15, 2); updateTransform(); });
+        document.getElementById('btn-zoom-out').addEventListener('click', () => { scale = Math.max(scale - 0.15, 0.4); updateTransform(); });
+        document.getElementById('btn-reset').addEventListener('click', () => { scale = 0.85; position = { x: 50, y: 150 }; updateTransform(); });
 
     </script>
 </body>
