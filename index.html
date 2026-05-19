@@ -22,15 +22,8 @@
 </head>
 <body class="bg-slate-900 select-none text-slate-200">
 
-    <!-- Cabecera Fija con Imagen Temática -->
+    <!-- Cabecera Fija -->
     <header class="fixed top-0 left-0 w-full z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-xl px-4 py-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-center sm:text-left relative">
-        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shrink-0 border-[3px] border-indigo-500/50 shadow-lg shadow-indigo-900/20">
-            <img 
-                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" 
-                alt="" 
-                class="w-full h-full object-cover"
-            >
-        </div>
         <div class="flex flex-col items-center sm:items-start">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 flex items-center gap-2">
                 <i data-lucide="network" class="w-7 h-7 sm:w-8 sm:h-8 text-indigo-400"></i>
@@ -59,9 +52,9 @@
     <div class="absolute bottom-6 left-6 z-30 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 text-xs sm:text-sm text-slate-300 bg-slate-800/90 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl sm:rounded-full shadow-lg border border-slate-700 pointer-events-none font-medium max-w-[60%] sm:max-w-none">
         <span class="flex items-center gap-2"><i data-lucide="mouse-pointer-click" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Clic para expandir ramas</span><span class="sm:hidden">Expandir</span></span>
         <span class="hidden sm:block text-slate-600">|</span>
-        <span class="flex items-center gap-2 text-indigo-200"><i data-lucide="file-text" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Toca los retos finales para ver detalles</span><span class="sm:hidden">Detalles</span></span>
+        <span class="flex items-center gap-2 text-indigo-200"><i data-lucide="file-text" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Toca los retos finales</span><span class="sm:hidden">Detalles</span></span>
         <span class="hidden sm:block text-slate-600">|</span>
-        <span class="flex items-center gap-2"><i data-lucide="move" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Arrastra el fondo</span><span class="sm:hidden">Mover</span></span>
+        <span class="flex items-center gap-2"><i data-lucide="move" class="w-4 h-4 shrink-0"></i> <span class="hidden sm:inline">Arrastra o haz scroll para mover</span><span class="sm:hidden">Mover/Scroll</span></span>
     </div>
 
     <!-- Lienzo Arrastrable (Canvas) -->
@@ -127,61 +120,49 @@
         const infoModalTitle = document.getElementById('info-modal-title');
         const infoModalContent = document.getElementById('info-modal-content');
 
-        // Diccionario de imágenes temáticas
-        const imageMap = {
-            'formación': 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
-            'multimedia': 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?auto=format&fit=crop&w=600&q=80',
-            'herramientas': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80',
-            'retroalimentación': 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80',
-            'materiales': 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80',
-            'planificación': 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=600&q=80',
-            'presencial': 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
-            'virtual': 'https://images.unsplash.com/photo-1610484826917-0f101a7bf7f4?auto=format&fit=crop&w=600&q=80',
-            'interactividad': 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
-            'transmisivo': 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?auto=format&fit=crop&w=600&q=80',
-            'inestables': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80',
-            'conexiones': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80',
-            'obsoletos': 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=600&q=80',
-            'técnico': 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
-            'desmotivación': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80',
-            'interacción': 'https://images.unsplash.com/photo-1529156069898-49953eb1f5ce?auto=format&fit=crop&w=600&q=80',
-            'síncronas': 'https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80',
-            'autenticidad': 'https://images.unsplash.com/photo-1585076641399-5c06d1b3365f?auto=format&fit=crop&w=600&q=80',
-            'formativa': 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80',
-            'retraso': 'https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=600&q=80',
-            'extendida': 'https://images.unsplash.com/photo-1497215848145-5afd60a3d5ce?auto=format&fit=crop&w=600&q=80',
-            'desbalance': 'https://images.unsplash.com/photo-1498677231914-50a74ad2805f?auto=format&fit=crop&w=600&q=80',
-            'efectividad': 'https://images.unsplash.com/photo-1516534775068-ba3e7458af70?auto=format&fit=crop&w=600&q=80',
-            'modificar': 'https://images.unsplash.com/photo-1455309036818-60c04f995874?auto=format&fit=crop&w=600&q=80',
-            'capacitación': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80',
-            'acompañamiento': 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=600&q=80',
-            'políticas': 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80',
-            'default': 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=600&q=80'
+        // Diccionario de definiciones por cada reto
+        const definitionsMap = {
+            'Falta de formación en plataformas': 'Carencia de conocimientos técnicos o pedagógicos para utilizar adecuadamente los sistemas de gestión de aprendizaje (LMS) y sus herramientas integradas.',
+            'Dificultades en recursos multimedia': 'Obstáculos al intentar crear, editar o integrar videos, audios y animaciones interactivas que resulten atractivas para los estudiantes.',
+            'Inseguridad con herramientas': 'Falta de confianza o temor a cometer errores técnicos frente a los estudiantes durante el uso de aplicaciones digitales en vivo.',
+            'Demanda constante de retroalimentación': 'La expectativa generada en los estudiantes de recibir respuestas inmediatas a sus dudas o correcciones detalladas de sus tareas en cualquier momento.',
+            'Preparación de materiales digitales': 'El excesivo tiempo y esfuerzo requerido para adaptar contenidos físicos o crear materiales interactivos desde cero para el formato online.',
+            'Aumento del tiempo de planificación': 'Incremento significativo en las horas dedicadas a estructurar las clases, foros, guías y actividades virtuales respecto a la modalidad presencial.',
+            'Transformación de presencial a virtual': 'El complejo reto de adaptar metodologías tradicionales a un entorno digital sin perder la esencia, calidad y los objetivos de aprendizaje.',
+            'Falta de interactividad y dinamismo': 'Dificultad para diseñar actividades que mantengan al estudiante activo y participativo, evitando que sea un mero espectador detrás de la pantalla.',
+            'Predominio del modelo transmisivo': 'Tendencia a replicar la clase magistral unidireccional (donde el profesor habla y el alumno escucha) a través de interminables videoconferencias.',
+            'Conexiones inestables': 'Fallos recurrentes en el servicio de internet que interrumpen las clases sincrónicas, provocan desconexiones o dificultan el intercambio de archivos.',
+            'Equipos obsoletos': 'Uso de computadoras o dispositivos móviles con hardware desactualizado que se congelan o no soportan adecuadamente las herramientas virtuales modernas.',
+            'Falta de apoyo técnico institucional': 'Carencia de un equipo de soporte rápido y eficaz en la escuela o universidad para resolver problemas técnicos urgentes tanto de docentes como de alumnos.',
+            'Desmotivación': 'Pérdida de interés, entusiasmo y compromiso de los estudiantes hacia su propio proceso de aprendizaje debido a la barrera de la pantalla.',
+            'Escasa interacción': 'Falta de comunicación fluida, debate y trabajo colaborativo tanto entre los propios estudiantes como con el profesor.',
+            'Ausencia en actividades síncronas': 'Bajo índice de asistencia o nula participación (cámaras y micrófonos apagados) en las clases dictadas en vivo.',
+            'Validación de la autenticidad': 'Dificultad para asegurar de forma confiable que el estudiante es quien realmente realiza la evaluación y no incurre en copias o plagio.',
+            'Dificultad para evaluación formativa': 'Complicaciones para hacer un seguimiento continuo del proceso de aprendizaje del alumno y brindarle correcciones a tiempo.',
+            'Retraso en retroalimentación': 'Demora inevitable en la revisión, calificación y entrega de comentarios constructivos debido a la inmensa cantidad de entregables digitales recibidos.',
+            'Disponibilidad extendida': 'La sensación y presión de tener que estar conectado y disponible para responder mensajes, foros y correos las 24 horas del día.',
+            'Desbalance vida laboral-personal': 'La invasión del espacio físico de la casa, el tiempo personal y las rutinas familiares por las exigencias continuas del teletrabajo docente.',
+            'Dudas sobre efectividad virtual': 'Escepticismo o fuerte creencia, tanto propia como del entorno, de que la enseñanza en línea es inherentemente de menor calidad que la modalidad presencial.',
+            'Resistencia a modificar prácticas': 'Incomodidad o negativa a abandonar los métodos de enseñanza tradicionales probados durante años para aprender nuevas metodologías tecnológicas.',
+            'Escasa capacitación continua': 'Falta de programas institucionales de actualización docente que sean pertinentes, sistemáticos y que vayan más allá de un simple tutorial.',
+            'Limitado acompañamiento técnico': 'Ausencia de un proceso de guía, mentoría pedagógica y soporte humano continuo para los docentes durante su transición digital.',
+            'Ausencia de políticas claras': 'Falta de normativas institucionales establecidas sobre el uso de plataformas, horarios laborales, lineamientos de evaluación y convivencia virtual.'
         };
-
-        function getImageUrlForTitle(title) {
-            const t = title.toLowerCase();
-            for (const [key, url] of Object.entries(imageMap)) {
-                if (t.includes(key)) return url;
-            }
-            return imageMap['default'];
-        }
 
         function openInfoModal(title) {
             infoModalTitle.textContent = title;
-            const imageUrl = getImageUrlForTitle(title);
+            
+            // Buscar la definición en el diccionario, si no existe mostrar texto por defecto
+            const definition = definitionsMap[title] || 'Has seleccionado un desafío específico dentro del mapa conceptual sobre Entornos Virtuales de Aprendizaje (EVA).';
             
             // Inyectamos el contenido que pertenece a la jerarquía inferior
             infoModalContent.innerHTML = `
-                <div class="bg-slate-700/30 border border-slate-600/50 rounded-xl overflow-hidden shadow-inner">
-                    <img src="${imageUrl}" alt="[Image of ${title}]" class="w-full h-40 sm:h-48 object-cover border-b border-slate-600/50">
-                    <div class="p-5">
-                        <p class="text-slate-200 mb-3">Has seleccionado un desafío específico dentro del mapa conceptual sobre Entornos Virtuales de Aprendizaje (EVA).</p>
-                        <div class="flex items-start gap-3 mt-4 bg-slate-800 p-4 rounded-lg border border-slate-700 shadow-md">
-                            <i data-lucide="chevron-right-square" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
-                            <p class="font-medium text-slate-100">${title}</p>
-                        </div>
+                <div class="bg-slate-700/30 border border-slate-600/50 rounded-xl shadow-inner p-5">
+                    <div class="flex items-start gap-3 mb-4 bg-slate-800 p-4 rounded-lg border border-slate-700 shadow-md">
+                        <i data-lucide="chevron-right-square" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
+                        <h4 class="font-bold text-slate-100 text-base md:text-lg">${title}</h4>
                     </div>
+                    <p class="text-slate-300 leading-relaxed">${definition}</p>
                 </div>
             `;
             
@@ -390,6 +371,23 @@
         }, { passive: false });
         
         window.addEventListener('touchend', stopDrag);
+
+        // Evento de Rueda del Ratón (Scroll) para moverse por el mapa
+        canvasContainer.addEventListener('wheel', (e) => {
+            // Previene el comportamiento por defecto de la página
+            e.preventDefault();
+            
+            if (e.ctrlKey) {
+                // Si mantiene presionado Ctrl, hace zoom
+                const zoomDelta = e.deltaY > 0 ? -0.1 : 0.1;
+                scale = Math.max(0.3, Math.min(scale + zoomDelta, 2));
+            } else {
+                // Scroll normal mueve el mapa hacia arriba/abajo (o lados)
+                position.x -= e.deltaX;
+                position.y -= e.deltaY;
+            }
+            updateTransform();
+        }, { passive: false });
 
         // Controles
         document.getElementById('btn-zoom-in').addEventListener('click', () => { scale = Math.min(scale + 0.15, 2); updateTransform(); });
